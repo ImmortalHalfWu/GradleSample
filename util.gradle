@@ -1,0 +1,120 @@
+import com.sun.istack.internal.NotNull
+
+//基本数据
+println "基本数据"
+println "In util, gradle id is " +gradle.hashCode()
+println "Home Dir:" + gradle.gradleHomeDir
+println "User Home Dir:" + gradle.gradleUserHomeDir
+println "Parent: " + gradle.parent
+println "\n"
+println "BuildFile : " + rootProject.getBuildFile().getAbsolutePath()
+println "RootProject : " + rootDir.getName()
+println "RootDir : " + rootDir.getAbsolutePath()
+println "Root Properties" + rootProject.getProperties()
+println "gradle Properties" + gradle.getProperties()
+println "\n"
+
+//动态读取配置文件数据
+println "动态读取配置文件数据"
+Properties gradleProperties = new Properties()
+File gradlePropertiesFile = new File(rootDir.getAbsolutePath() + "/util.properties")
+gradleProperties.load(gradlePropertiesFile.newDataInputStream())
+gradleProperties.getProperties()
+Set<String> propertyKeys = gradleProperties.stringPropertyNames()
+propertyKeys.each {
+    String mKey ->
+        String value = gradleProperties.getProperty(mKey)
+        gradle.ext.$mKey = value
+        println gradle.$mKey
+}
+String BaseUel = gradleProperties.getProperty("BASE_URL_QA")
+gradle.ext.baseUrl = BaseUel
+//println gradle.baseUrl
+println gradleProperties.stringPropertyNames()
+println ''
+
+//java数据结构
+//println "java数据结构"
+//List<String> strings = new ArrayList();
+//strings.add("1")
+//println 'List : ' + strings
+//println 'List size : ' + strings.size()
+
+println "\n"
+
+
+
+void print(String s){
+    println '-----------------------------'+project.getName()+'------------------------------------'
+    println s
+    println '-----------------------------'+project.getName()+'------------------------------------'
+}
+
+/**
+ * 删除指定文件、文件夹
+ * @param filePath
+ */
+void deleteFile(@NotNull String filePath){
+    File file = new File(filePath)
+    boolean result = true
+    if (file.exists()){
+        if (file.isFile()){
+            result = file.delete()
+        }else {
+            result = file.deleteDir()
+        }
+    }
+    print('删除' + filePath + (result?'成功':'失败'))
+}
+
+/**
+ * 复制文件到指定位置
+ * @param fromFilePath
+ * @param toFilePath
+ */
+void copyFileTo(@NotNull String fromFilePath,@NotNull String toFilePath){
+    print('复制文件 : ' + fromFilePath + ' -->至 :' + toFilePath)
+    deleteFile(toFilePath)
+
+    File fromFile = new File(fromFilePath)
+    File toFile = new File(toFilePath)
+
+    if (!fromFile.exists()){
+        print('复制文件'+fromFile+'失败，文件不存在')
+        return
+    }
+    toFile.withOutputStream {
+        outStream ->
+            fromFile.withInputStream {
+                inStream ->
+                    outStream << inStream
+            }
+    }
+}
+
+/**
+ * 关闭Debug构建，不生成Debug包，需在Gradle构建完task关系图后才可获取到Debug task
+     project.afterEvaluate {
+        closeAllDebugBuild()
+     }
+ */
+void closeAllDebugBuild(){
+    def mTasks = project.tasks.findAll {
+        mTask ->
+            mTask.name.contains('Debug')
+    }
+    print('所有task + ' + mTasks.toString())
+    mTasks.each {
+        mTask ->
+            mTask.enabled false
+            print('关闭' + mTask.getName())
+    }
+}
+
+
+ext{
+    deleteFile = this.&deleteFile
+    copyFileTo = this.&copyFileTo
+    closeAllDebugBuild = this.&closeAllDebugBuild
+}
+

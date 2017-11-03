@@ -1,0 +1,4 @@
+//apply from:getRootDir().getAbsolutePath() + "/util.gradle"
+//println 'setting gradle'
+//println ''
+include ':app', ':lib_one', ':lib_two', ':app_two'

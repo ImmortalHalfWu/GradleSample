@@ -1,0 +1,49 @@
+
+
+//------------------------------------------预加载------------------------------------------------
+
+void loadProperties(String propertiesPath){
+    println '\n-------------------------------装载Properties文件-------------------------------------'
+    if (propertiesPath == null){
+        println 'Properties 装载失败,propertiesPath 为null\n'
+    }
+    //properties 文件对象
+    File propertiesFile = new File(propertiesPath)
+    if (!propertiesFile.exists()){
+        println 'Properties 装载失败,Properties文件不存在\n'
+    }
+
+    try{
+        println '开始装载Properties文件: ' + propertiesPath
+        //properties 对象，读取properties文件字段
+        Properties utilProperties = new Properties()
+        //加载配置文件
+        utilProperties.load(propertiesFile.newDataInputStream())
+
+        println '装载成功,开始填充gradle数据:'
+        //获取配置文件中所有的Key值
+        List<String> propertiesKeys = utilProperties.stringPropertyNames().asList()
+        //遍历Key值获取对应value
+        propertiesKeys.each {
+            String propertiesKey ->
+                //并设置全局变量,变量名为Key,值为value
+                thisObject.ext.$propertiesKey = utilProperties.getProperty(propertiesKey)
+                println(thisObject.$propertiesKey)
+                //打印赋值结果
+//                println propertiesKey + ' = ' + thisObject.$propertiesKey
+                if (propertiesKeys.indexOf(propertiesKey)==propertiesKeys.size()-1){
+                    println '-------------------------------装载Properties文件成功-------------------------------------\n'
+                }
+        }
+    }catch (Exception ignored){
+        println '装载Properties文件失败: ' + ignored.getMessage()+'\n'
+    }
+}
+
+
+ext{
+    loadProperties = this.&loadProperties
+}
+
+
+
