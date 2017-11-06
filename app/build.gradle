@@ -14,15 +14,17 @@ android {
         versionName project.VERSION_NAME
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
-        println('+++++++++++++++++++++++++++++++++++++++++buildTypes+++++++++++++++++++++++++++++++++++++++++++++++++++++')
-        release {
+        debug{
+            def buildType = project.BASE_URL_QA
+            //向BuildConfig中添加字段，类型，变量名，值
+            buildConfigField("String","BASE_URL",buildType)
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-        debug{
-            def buildType = project.BASE_URL_QA
-            buildConfigField("String","BASE_URL",buildType)
+        release {
+            println('release')
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -39,6 +41,7 @@ android {
     }
 
 }
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {

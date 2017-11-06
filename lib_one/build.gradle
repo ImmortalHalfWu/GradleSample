@@ -33,16 +33,16 @@ dependencies {
 }
 
 //限定只打release包
-//project.afterEvaluate {
-//    closeAllDebugBuild()
-//}
+project.afterEvaluate {
+    closeAllDebugBuild()
+}
 
 //assemble之后将release包复制到指定目录
 tasks.getByName('assemble').doLast {
     println "$project.name: -----------------After assemble, jar libs are copied tolocal repository"
     getBuildDir().getAbsolutePath()+'\\outputs\\aar\\lib_one-release.aar'
 
-    copyFileTo(getBuildDir().getAbsolutePath()+'\\outputs\\aar\\lib_one-release.aar',rootProject.getChildProjects().get('app').getProjectDir().absolutePath+'\\libs'+'\\lib_one-release.aar')
+    copyFileTo(getBuildDir().getAbsolutePath()+'\\outputs\\aar\\lib_one-release.aar',rootProject.getChildProjects().get('app').getProjectDir().absolutePath+'\\libs'+'\\lib_one-release-'+android.defaultConfig.versionName+'.aar')
 }
 
 //copyFileTo(getBuildDir().getAbsolutePath()+'\\outputs\\aar\\lib_one-release.aar',project.getProjectDir().getAbsolutePath()+'\\lib_one-release.aar')
